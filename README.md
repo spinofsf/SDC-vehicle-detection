@@ -98,12 +98,10 @@ HOG parameters of orientation, pixels per cell and cells per block were obtained
 
 Shown below is a set of random car images from the data set with color conversion YCrCb and HOG gradients applied to Ch1
 
-![Original Image](./writeup_images/Ycrcb_car_images.png)
 ![Original Image](./writeup_images/HOG_car_images.png)
 
 Shown below is a set of random non-car images with color conversion YCrCb and HOG gradients applied to Ch1
 
-![Original Image](./writeup_images/Ycrcb_noncar_images.png)
 ![Original Image](./writeup_images/HOG_noncar_images.png)
 
 ### Training a SV classifier
