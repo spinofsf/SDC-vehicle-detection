@@ -260,6 +260,25 @@ def print_randimstrip(imglist, no_to_print, imtitle=''):
     plt.show()
     return
 
+#Pick random images from the data set and apply color conversion and HOG gradients 
+def print_randhogimstrip(imglist, no_to_print, imtitle, orient, pix_per_cell, cell_per_block, vis=True, feature_vec=True):
+    plt.figure(figsize=(15,7))
+    for i in np.arange(0, no_to_print):
+        ri = np.random.randint(0, len(imglist))            
+        img_arr = plt.imread(imglist[ri])
+        conv_img_arr = convert_color(img_arr, 'RGB2YCrCb')
+        
+        plt.subplot(2,no_to_print,i+1)
+        plt.imshow(conv_img_arr[:,:,0])
+        plt.title("YCrCb image")
+        
+        plt.subplot(2,no_to_print,no_to_print + (i+1))
+        feat, hog_img = get_hog_features(conv_img_arr[:,:,0], orient, pix_per_cell, cell_per_block, True, True)
+        plt.imshow(hog_img)
+        plt.title('HOG')        
+    plt.show()
+    return
+
 
 # Define a single function that can extract features using hog sub-sampling and make predictions
 def find_cars(img, ystart, ystop, scale, svc, X_scaler, orient, pix_per_cell, cell_per_block, spatial_size, hist_bins):
