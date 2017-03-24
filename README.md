@@ -1,14 +1,14 @@
 # SDC-vehicle-detection
-The goal of this project is to implement a simple vehicle detection pipeline from the vision system in the car. Vehicles are detected by first training a classifier on car and non-car sample data sets and using a sliding window search on the input frames to detect cars. The features vectors, heat map thresholds, sliding window scales used to train the classifier and detect car images have been experimented with quite a bit to derive at the final values.
+The goal of this project is to implement a simple vehicle detection pipeline from the vision system in the car. Vehicles are detected by creating a feature vector using HOG, spatial and color histograms and training a SVM classifier on car and non-car data sets. A sliding window search is then used on the input frames to detect cars. The features vectors, heat map thresholds, sliding window scales used to train the classifier and detect car images have been experimented with quite a bit to derive at the final values.
 
-Even though HOG classifier coupled with an SVM classifier is simple, it is clear that these techniques are not sufficient to build a robust pipeline to detect vehicles in real time. A hardware software hybrid approach where some of these image processing functions are implemented in hardware might be needed. 
+Even though HOG feature vectors coupled with an SVM classifier is a simple approach, it is clear that these techniques are not sufficient to build a robust pipeline to detect vehicles in real time especially considering the speed of this pipeline. A hardware software hybrid approach where some of these image processing functions are implemented in hardware might be needed. 
 
 Key steps of this project are:
 * Examined the dataset of car and non-car images
-* Extracted featureset for the images by appending 1) Spatial transform 2) Color histograms on all channels and 3) Histogram of Oriented Gradients (HOG) 
-* Train a classifier Linear SVM classifier
+* Extracted featureset for the images by appending 1) Spatial transform 2) Color histograms on all channels and 3) Histogram of Oriented Gradients (HOG) on all channels
+* Train a Linear SVM classifier
 * Implement a sliding window search on the input frames and use the trained classifier to search for vehicles in each window
-* For all classifications, create a cumulative heatmap on multiple frames and apply a threshold to remove false positives. 
+* For all classifications, create a cumulative merged heatmap on multiple frames and apply a threshold to remove false positives. 
 * Estimate a bounding box for vehicles detected
 
 ---
@@ -16,7 +16,7 @@ Key steps of this project are:
 
 Run the python notebook `vehicle_detection.ipynb` for detecting vehicles in the images and video. Implementation consists of the following files located in the source directory
 
-* source/vehicle_detection.ipynb  :   Runs the pipeline on test images and project video   
+* source/vehicle_detection.ipynb  :   Runs the pipeline on test images and project video  
 * source/tracking_pipeline.py     :   Implements functions required for feature collection, SVM classification and vehicle detection 
 * out_images                      -   Folder with images at different stages of the pipeline
 * out_videos                      -   Folder with lane detected output videos 
