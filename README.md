@@ -138,7 +138,7 @@ A test accuracy of 99% is achieved on the test dataset.
 
 ### Sliding window search
 
-The next step of the pipeline is to implement a sliding window search as shown in function `findcars()`. The window uses a 64x64 window with additional scale factors of 0.8, 1.0 and 1.8 applied. Overlap is set to 75% of the window size. Scale factors were determined experimentally so that cars that are at different locations in the frame can be identified. For example, the 0.8 scale factor results in detecting cars that show up smaller (at a distance) and the 1.8 detects cars that larger (closer to the source camera).
+The next step of the pipeline is to implement a sliding window search as shown in function `findcars()`. The window uses a 64x64 window with additional scale factors of 0.8, 1.0 and 1.8 applied.  Scale factors were determined experimentally so that cars that are at different locations in the frame can be identified. For example, the 0.8 scale factor results in detecting cars that show up smaller (at a distance) and the 1.8 detects cars that larger (closer to the source camera). Overlap is set to 75% of the window size. Experiments were run to change the overlap based on the scale factor, however did not show much improvement compared to single 75% overlap throughout.
 
 The `findcars()` function runs the HOG classifier once on the entire image and then sub-samples to get all the sliding windows which turned out to be faster than the implementating the search and detection portion separately. 
 
