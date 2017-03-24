@@ -229,9 +229,6 @@ Here are some sample test images showing sliding window detection, heatmapped im
 ![alt text](./writeup_images/pipeline_testimage3.png)
 ---
 
-
-
-
 ### Video detection
 
 To enable better detection and removal of false positives, detected heatmaps are queued and added over frames. Queue length and thresholding are determined by experimentation. In this case, detections were queued over 15 frames for each of the scale factors [0.8, 1.0, 1.8]. A heatmap threshold of 35 was then used to eliminate false positives. The queuing is implemented in `vehicle_detection.ipynb` as shown below
@@ -252,17 +249,15 @@ for frame in clip.iter_frames():
  
 ```
 
-
-
 ###Video Output
 
-Here are links to the [video output](./output_video/adv_lane_track.mp4).
+Here are links to the [video output](https://youtu.be/0I4V4x2imvg).
 
-Another version is shown [here](./output_video/adv_lane_track1.mp4). The difference in both videos is mostly due to the areas selected for perspective transform and thresholds selected for color and gradient transforms. 
+Another version is shown [here](https://youtu.be/JZjeujdfIgU). The difference is mostly from a slightly different heatmap thresholded value. 
+
+Note that in the video when the car begins to appear, instead of one single bounding box, there are multiple small ones shown on the car. THese are all correct identifications of the car vehicle, the only difference is that rather than waiting 15 frames of averaging and showing the actual bounding box, the detections are shown immediately and improved. The logic behind this is that it is better to show correct detections immediately rather than wait for 15 frames (~0.4 sec) since this information is very crucial for driving decisions. 
 
 ---
 
 ###Discussion and further work
-This project is aN introduction to camera calibration, color and perspective transforms and curve fitting functions. However, it is not very robust and depends heavily on many factors going right. 
-
-As you can see the pipeline is not robust in areas where the road has strong shadows and is wobbly. Also sections of the road with lighter color(concrete sections) combined with reflections of the sun make detecting lane especially the white dotted right lines much harder. There is already significant volume of academic research on shadow detection and elimination in images and this is an area that i would like understand and implement in the near future.
+This project is an introduction to HOG feature detection, SVC and heatmaps. Using different features from color histograms, raw pixel locations and HOG to build a powerful feature vector is also a good learning exercise. However, this pipeline implementation is very slow and depends quite a bit on experimentation to find the right threshold values to remove false positives. It will be interesting to explore the current state of the art in vehicle detection techniqies. Due to the speed limitation, my guess would be a combination hw/sw hybrid approach is the best solution for this case.
