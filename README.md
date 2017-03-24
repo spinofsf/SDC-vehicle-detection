@@ -33,9 +33,7 @@ The data set used is comprised of images taken from the GTI vehicle image databa
 Plotting some random samples from both the datasets
 
 ![Original](./writeup_images/sample_car_images.png)
-![Original Image](./writeup_images/sample_noncar_images.png)
-
-
+![Original Image](./writeup_images/sample_non_car_images.png)
 
 
 ```python
