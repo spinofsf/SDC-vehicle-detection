@@ -116,7 +116,7 @@ X_train, X_test, y_train, y_test = train_test_split(
     scaled_X, y, test_size=0.2, random_state=rand_state)
 ```
 
-A Linear SVC is then straight forward to train as shown below. This is implemeted in the file 
+A Linear SVC is then trained as shown below. This is implemeted in the file `vehicle_detection.ipynb`
 
 ```python
 # Use a linear SVC 
@@ -130,12 +130,117 @@ A test accuracy of 99% is achieved is achieved on the dataset.
 
 ### Sliding window search
 
-The next step of the pipeline is to implement a sliding window search as shown in function `findcars()`. Since cars and the road only occupy the bottom portion of the image, sliding window technique is applied only to the lower portion of the image. Scaling of the windows was experimented with quite a bit. Eventaually scales of [0.8, 1.0 and 1.8] were used on the image. 
+The next step of the pipeline is to implement a sliding window search as shown in function `findcars()`. The window uses a 64x64 window with additional scale factors of 0.8, 1.0 and 1.8 applied. Overlap is set to 75% of the window size. Scale factors were determined experimentally so that cars that are at different locations in the frame can be identified.  The `findcars()` function runs the HOG classifier once on the entire image and then sub-samples to get all the sliding windows which turned out to be faster than the implementating the search and detection portion separately. 
+
+Since the cars only occupy the bottom portion of the image, sliding window technique is limited to y coordinates [380, 560]. The output of the sliding window are shown below.
 
 
+![Original Image](./writeup_images/sample_non_car_images.png)
 
 
-This entire pipeline is implemented in the file `gen_detection_pipeline.py`. Shown below is an image before and after passing through the pipeline
+### Merging windows and heatmaps
+
+The windows that have been positively classified by the SVC are then merged and a heatmap is created. This enables the multiple detections of nearby sliding windows to be combined and 
+
+```python
+def add_heat(heatmap, bbox_list):
+    # Iterate through list of bboxes
+    for box in bbox_list:
+        # Add += 1 for all pixels inside each bbox
+        # Assuming each "box" takes the form ((x1, y1), (x2, y2))
+        heatmap[box[0][1]:box[1][1], box[0][0]:box[1][0]] += 1
+
+    # Return updated heatmap
+    return heatmap# Iterate through list of bboxes
+```
+The result of the heatmap created on a detection is shown below. Note that heatmaps created by errors in the classifier as still present as false positives. A threshold is then applied to remove false positives and to create a uniform bounding box around the vehicle. This is implemented in the function `apply_threshold()` as shown below. 
+
+```python
+def apply_threshold(heatmap, threshold):
+    # Zero out pixels below the threshold
+    heatmap[heatmap <= threshold] = 0
+    # Return thresholded map
+    return heatmap
+```
+Labelling is implemented as shown below using the scikit learn `label()` function so that different bounding boxes are shown for vehicles detected in each of the thresholded heatmap regions.
+
+```python 
+def draw_labeled_bboxes(img, labels):
+    # Iterate through all detected cars
+    for car_number in range(1, labels[1]+1):
+        # Find pixels with each car_number label value
+        nonzero = (labels[0] == car_number).nonzero()
+        # Identify x and y values of those pixels
+        nonzeroy = np.array(nonzero[0])
+        nonzerox = np.array(nonzero[1])
+        # Define a bounding box based on min/max x and y
+        bbox = ((np.min(nonzerox), np.min(nonzeroy)), (np.max(nonzerox), np.max(nonzeroy)))
+        # Draw the box on the image
+        cv2.rectangle(img, bbox[0], bbox[1], (0,0,255), 6)
+    # Return the image
+    return img
+```
+
+### Video detection
+
+To enable better detection and removal of false positives, detected heatmaps are queued and added over frames. Queue length and thresholding are determined by experimentation. In this case, detections were queued over 15 frames for each of the scale factors [0.8, 1.0, 1.8]. A heatmap threshold of 35 was then used to eliminate false positives. The queuing is implemented in `vehicle_detection.ipynb` as shown below
+
+```python
+for frame in clip.iter_frames():    
+    
+    #call the pipeline and get the heatmap and images with bounding boxes
+    fin_img, hmap, heatmap, bb_img  = detection_pipeline(frame, hmaps_q, ystart, ystop, scale, svc, X_scaler, orient, pix_per_cell, cell_per_block, spatial_size, hist_bins, heat_threshold)
+    
+    #append frames with labelled bounding boxes
+    output_frames.append(bb_img)
+    
+    # Queue the heatmaps and retain only the last que_len frames 
+    if count > que_len:
+        hmaps_q.pop(0)    
+    hmaps_q.append(hmap)
+ 
+```
+
+This entire pipeline is implemented in the file `tracking_pipeline.py`. Shown below is an image before and after passing through the pipeline
+
+```python
+def detection_pipeline(image, hmaps_q, ystart, ystop, scale, svc, X_scaler, orient, 
+                                 pix_per_cell, cell_per_block, spatial_size, hist_bins, heat_threshold):
+
+    hot_windows_fin = []
+
+    for scale_val in scale:
+        fin_img, hot_windows = find_cars(image, ystart, ystop, scale_val, svc, X_scaler, 
+                                orient, pix_per_cell, cell_per_block, spatial_size, hist_bins)
+        hot_windows_fin.extend(hot_windows)
+    #window_img = draw_boxes(draw_image, hot_windows, color=(0, 0, 255), thick=6)                    
+    #window_img = draw_boxes(draw_image, windows, color=(0, 0, 255), thick=6)                    
+
+    
+    heat = np.zeros_like(image[:,:,0]).astype(np.float)
+
+    
+    # Add heat to each box in box list
+    # change box_list variable below...
+    hmap = add_heat(heat,hot_windows_fin)
+    
+    hmap_merge = hmap
+    
+    for j in np.arange(0,len(hmaps_q)):
+        hmap_merge = np.add(hmaps_q[j],hmap_merge)
+            
+    # Apply threshold to help remove false positives
+    heat = apply_threshold(hmap_merge,heat_threshold)
+
+    # Visualize the heatmap when displaying    
+    heatmap = np.clip(heat, 0, 255)
+
+    # Find final boxes from heatmap using label function
+    labels = label(heatmap)
+    draw_img = draw_labeled_bboxes(np.copy(image), labels)
+    
+    return fin_img, hmap, heatmap, draw_img
+```
 
 ![alt text](./writeup_images/pipeline.png)
 ---
