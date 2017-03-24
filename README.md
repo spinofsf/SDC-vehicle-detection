@@ -147,7 +147,7 @@ Since the cars only occupy the bottom portion of the image, sliding window techn
 
 ### Merging windows and heatmaps
 
-The windows that have been positively classified by the SVC are then merged and a heatmap is created. This enables the multiple detections of nearby sliding windows to be combined and 
+The windows that have been positively classified by the SVC are then merged and a heatmap is created. This enables the multiple detections of nearby sliding windows to be combined. Since many different sliding windows detect cars rather than non-cars, this approach acts as first step in classifying cars corretly most of the time, although with false positives.
 
 ```python
 def add_heat(heatmap, bbox_list):
@@ -160,7 +160,7 @@ def add_heat(heatmap, bbox_list):
     # Return updated heatmap
     return heatmap# Iterate through list of bboxes
 ```
-The result of the heatmap created on a detection is shown below. Note that heatmaps created by errors in the classifier as still present as false positives. A threshold is then applied to remove false positives and to create a uniform bounding box around the vehicle. This is implemented in the function `apply_threshold()` as shown below. 
+The result of the heatmap created is shown below. Note that errors in the classifier as still present as false positives. A threshold is then applied to remove false positives and to create a uniform bounding box around the vehicle. This is implemented in the function `apply_threshold()` as shown below. 
 
 ```python
 def apply_threshold(heatmap, threshold):
@@ -169,7 +169,7 @@ def apply_threshold(heatmap, threshold):
     # Return thresholded map
     return heatmap
 ```
-Labelling is implemented as shown below using the scikit learn `label()` function so that different bounding boxes are shown for vehicles detected in each of the thresholded heatmap regions.
+Labelling is implemented as shown below using the scikit learn `label()` function so that bounding boxes are combined and shown for different vehicles detected in each of the thresholded heatmap regions.
 
 ```python 
 def draw_labeled_bboxes(img, labels):
