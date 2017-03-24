@@ -1,38 +1,32 @@
 # SDC-vehicle-detection
-The goal of this project is to implement a simple vehicle detection pipeline from the vision system in the car. 
+The goal of this project is to implement a simple vehicle detection pipeline from the vision system in the car. Vehicles are detected by first training a classifier on car and non-car sample data sets and using a sliding window search on the input frames to detect cars. The features vectors, heat map thresholds, sliding window scales used to train the classifier and detect car images have been experimented with quite a bit to derive at the final values.
 
+Even though HOG classifier coupled with an SVM classifier is simple, it is clear that these techniques are not sufficient to build a robust pipeline to detect vehicles in real time. A hardware software hybrid approach where some of these image processing functions are implemented in hardware might be needed. 
 
-Distortion induced by the camera is taken into account and correction is applied to the image feed. As described below, an image pipeline comprising of multiple transforms(color, gradient and perspective) is implemented resulting in a "birds-eye view" of the front facing camera image. Polynomial fits and various statistics during the process are captured and displayed.
-
-From the output video, it is clear that simple image processing techniques are not sufficient to build a robust pipeline to detect lanes. Shadows on the road along with various road colors have a huge impact on detection accuracy. It will be interesting to further understand the accuracy of the current state-of-art approaches to lane detection. 
-
-Key steps of this pipeline are:
-* Calibrate and correct camera distortion using chessboard images 
-* Generate calibration matrix and distortion coefficients and undistort images
-* Apply color transforms, gradients, etc., to create a thresholded binary image.
-* Apply a perspective transform to generate ("birds-eye view").
-* Detect lane pixels and polyfit them to find the lane lines and warp back to the original image
-* Anotate images with lane boundaries and metrics like lane curvature and offset from center
+Key steps of this project are:
+* Examined the dataset of car and non-car images
+* Extracted featureset for the images by appending 1) Spatial transform 2) Color histograms on all channels and 3) Histogram of Oriented Gradients (HOG) 
+* Train a classifier Linear SVM classifier
+* Implement a sliding window search on the input frames and use the trained classifier to search for vehicles in each window
+* For all classifications, create a cumulative heatmap on multiple frames and apply a threshold to remove false positives. 
+* Estimate a bounding box for vehicles detected
 
 ---
 ###Code
 
-Run the python notebook `lane_line_detection.ipynb` for the pipeline and lane detection video. Implementation consists of the following files located in the source directory
+Run the python notebook `vehicle_detection.ipynb` for detecting vehicles in the images and video. Implementation consists of the following files located in the source directory
 
-* source/lane_line_detection.ipynb  :   Capture video frames and runs image pipeline   
-* source/gen_cam_cal.py             :   Generates camera calibration matrix and distortion coefficients using chessboard images
-* source/gen_process_image.py       -   Implements Sobel gradients, color and perspective tranforms
-* source/gen_linefit.py             -   Curve fit for lane detection  
-* source/gen_stats_display.py       -   Calculates curvature, offset and implements polyfill and anotation of images
-* source/gen_detection_pipeline.py  -   Implements the entire pipeline
-* out_images                        -   Folder with images from various stages of the pipeline
-* out_videos                        -   Folder with lane detected output videos 
+* source/vehicle_detection.ipynb  :   Runs the pipeline on test images and project video   
+* source/tracking_pipeline.py     :   Implements functions required for feature collection, SVM classification and vehicle detection 
+* out_images                      -   Folder with images at different stages of the pipeline
+* out_videos                      -   Folder with lane detected output videos 
 
-###Camera Calibration
+###Data Set
 
-Camera matrix and distortion coefficients are calculated using a set of chessboard images and Opencv functions.
+The data set used is comprised of images taken from the GTI vehicle image database, the KITTI vision benchmark suite. They comprise of two sets - car images and non-car images. Plotting some random samples
 
-First step is to map 3D real world object points to 2D image space for the chessboard images. The chessboard images are fixed on a constant XY plane during capture, so object points are 3D points with Z axis of 0. 
+
+
 
 ```python
     objp = np.zeros((6*9,3), np.float32)
