@@ -259,7 +259,7 @@ for frame in clip.iter_frames():
 
 ### Video Output
 
-Here are links to the [video output](https://youtu.be/0I4V4x2imvg).
+Here are links to the [video output](./output_videos/veh_detection_sample_full_0.8_1.0_1.8_35.mp4).
 
 Another version is shown [here](https://youtu.be/JZjeujdfIgU). The difference is mostly from a slightly different heatmap thresholded value. 
 
