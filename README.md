@@ -12,7 +12,7 @@ Key steps of this project are:
 * Estimate a bounding box for vehicles detected
 
 ---
-###Code
+### Code
 
 Run the python notebook `vehicle_detection.ipynb` for detecting vehicles in the images and video. Implementation consists of the following files located in the source directory
 
@@ -21,9 +21,17 @@ Run the python notebook `vehicle_detection.ipynb` for detecting vehicles in the 
 * out_images                      -   Folder with images at different stages of the pipeline
 * out_videos                      -   Folder with lane detected output videos 
 
-###Data Set
+### Data Set
 
-The data set used is comprised of images taken from the GTI vehicle image database, the KITTI vision benchmark suite. They comprise of two sets - car images and non-car images. Plotting some random samples
+The data set used is comprised of images taken from the GTI vehicle image database, the KITTI vision benchmark suite. They comprise of two sets - car images and non-car images. Total data set contains
+
+| Dataset       | Images        | 
+|:-------------:|:-------------:| 
+| Car           | 8792          | 
+| Non-car       | 8968          |
+
+Plotting some random samples from both the datasets
+
 
 
 
