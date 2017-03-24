@@ -188,7 +188,14 @@ def draw_labeled_bboxes(img, labels):
     return img
 ```
 
-This entire pipeline is implemented in the file `tracking_pipeline.py`. Shown below is an image before and after passing through the pipeline
+Here are some sample test images showing sliding window detection, heatmapped images and thresholded outputs. Note that since these are single images, no queuing on consecutive frames is applied and hence you still see the false positives. These false positives are completely eliminated with detection over cumulated heatmaps as shown in the video.
+
+![alt text](./writeup_images/pipeline_testimage6.png)
+![alt text](./writeup_images/pipeline_testimage4.png)
+![alt text](./writeup_images/pipeline_testimage3.png)
+---
+
+This entire pipeline is implemented in the file `tracking_pipeline.py` as shown below. Here the heatmaps are collected in a queue `hmaps_q` and merged to form a cumulative heatmap. Thresholding is then applied on this cumulative heatmap to detect a car.
 
 ```python
 def detection_pipeline(image, hmaps_q, ystart, ystop, scale, svc, X_scaler, orient, 
@@ -229,14 +236,7 @@ def detection_pipeline(image, hmaps_q, ystart, ystop, scale, svc, X_scaler, orie
     return fin_img, hmap, heatmap, draw_img
 ```
 
-Here are some sample test images showing sliding window detection, heatmapped images and thresholded outputs. Note that since these are single images, no queuing on consecutive frames is applied and hence you still see the false positives. These false positives are completely eliminated with detection over cumulated heatmaps as shown in the video.
-
-![alt text](./writeup_images/pipeline_testimage6.png)
-![alt text](./writeup_images/pipeline_testimage4.png)
-![alt text](./writeup_images/pipeline_testimage3.png)
----
-
-### Video detection
+### Video detection pipeline - Merging heatmap over frames 
 
 To enable better detection and removal of false positives, detected heatmaps are queued and added over frames. Queue length and thresholding are determined by experimentation. In this case, detections were queued over 15 frames for each of the scale factors [0.8, 1.0, 1.8]. A heatmap threshold of 35 was then used to eliminate false positives. The queuing is implemented in `vehicle_detection.ipynb` as shown below
 
@@ -256,6 +256,8 @@ for frame in clip.iter_frames():
     hmaps_q.append(hmap)
  
 ```
+
+
 
 ### Video Output
 
