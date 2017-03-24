@@ -23,7 +23,7 @@ Run the python notebook `vehicle_detection.ipynb` for detecting vehicles in the 
 
 ### Data Set
 
-The data set used is comprised of images taken from the GTI vehicle image database, the KITTI vision benchmark suite. They comprise of two sets - car images and non-car images. Total data set contains
+The data set used is comprised of images taken from the GTI vehicle image database and the KITTI vision benchmark suite. They comprise of two sets - car images and non-car images. Total data set contains about 18K images.
 
 | Dataset       | Images        | 
 |:-------------:|:-------------:| 
