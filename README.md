@@ -257,7 +257,7 @@ for frame in clip.iter_frames():
  
 ```
 
-###Video Output
+### Video Output
 
 Here are links to the [video output](https://youtu.be/0I4V4x2imvg).
 
@@ -267,5 +267,5 @@ Note that in the video when the car begins to appear, instead of one single boun
 
 ---
 
-###Discussion and further work
+### Discussion and further work
 This project is an introduction to HOG feature detection, SVC and heatmaps. Using different features from color histograms, raw pixel locations and HOG to build a powerful feature vector is also a good learning exercise. However, this pipeline implementation is very slow and depends quite a bit on experimentation to find the right threshold values to remove false positives. It will be interesting to explore the current state of the art in vehicle detection techniqies. Due to the speed limitation, my guess would be a combination hw/sw hybrid approach is the best solution for this case.
