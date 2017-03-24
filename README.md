@@ -244,7 +244,8 @@ To enable better detection and removal of false positives, detected heatmaps are
 for frame in clip.iter_frames():    
     
     #call the pipeline and get the heatmap and images with bounding boxes
-    fin_img, hmap, heatmap, bb_img  = detection_pipeline(frame, hmaps_q, ystart, ystop, scale, svc, X_scaler, orient, pix_per_cell, cell_per_block, spatial_size, hist_bins, heat_threshold)
+    fin_img, hmap, heatmap, bb_img  = detection_pipeline(frame, hmaps_q, ystart, ystop, scale, 
+                svc, X_scaler, orient, pix_per_cell, cell_per_block, spatial_size, hist_bins, heat_threshold)
     
     #append frames with labelled bounding boxes
     output_frames.append(bb_img)
