@@ -62,7 +62,7 @@ Feature extraction is implemented in the function `tracking_pipeline/extract_fea
         return hist_features
 ```
 
-Histogram of gradients is implemented using the function `get_hog_features()` as shown below
+Histogram of gradients are calculated using the scikit-learn function `hog()` and implemeted through `get_hog_features()` as shown below
 
 ```python
     def get_hog_features(img, orient, pix_per_cell, cell_per_block, 
@@ -86,19 +86,44 @@ Histogram of gradients is implemented using the function `get_hog_features()` as
             return features       
 ```
 
-HOG parameters were obtained by experimentation. Final values that used were 
+HOG parameters of orientation, pixels per cell and cells per block were obtained by experimentation. For the color space, while RGB gave good values, converting it to YCbCr seemed to better detect car features. Final values for HOG parameters are shown below
+
+| Parameter        | Value         | 
+|:----------------:|:-------------:| 
+| colorspace       | YCbCr         | 
+| Channel          | ALL           |
+| Orientations     | 9             | 
+| pixels per cell  | 8             |
+| cell per block   | 2             |
+
+### Training a SV classifier
+The next step is to train a linear support vector classifier. To do this first, the feature set is normalized and separated into a 80/20 train to test splot.
+
+```python
+X = np.vstack((car_features, notcar_features)).astype(np.float64)                        
+# Fit a per-column scaler
+X_scaler = StandardScaler().fit(X)
+# Apply the scaler to X
+scaled_X = X_scaler.transform(X)
+
+# Define the labels vector
+y = np.hstack((np.ones(len(car_features)), np.zeros(len(notcar_features))))
 
 
+# Split up data into randomized training and test sets
+rand_state = np.random.randint(0, 100)
+X_train, X_test, y_train, y_test = train_test_split(
+    scaled_X, y, test_size=0.2, random_state=rand_state)
+```
 
-The following thresholds were narrowed based on experimentation.
+A Linear SVC is then straight forward to train as shown below. This is implemeted in the file 
 
-| Transform               | Threshold     | 
-|:-----------------------:|:-------------:| 
-| S color                 | 170, 255      | 
-| SobelX grad             | 20, 100       |
-| Sobel gradmagnitude     | 20, 100       |
-| Sobel graddirection     | 0.7, 1.3      |
+# Use a linear SVC 
+svc = LinearSVC()
 
+# Check the training time for the SVC
+t=time.time()
+svc.fit(X_train, y_train)
 The final thresholded image is obtained by combining the various transforms as shown below. The code for thresholding is implemented in the file `source/gen_process_image.py`
 
 ```python
